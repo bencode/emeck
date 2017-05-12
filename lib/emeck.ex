@@ -56,5 +56,25 @@ defmodule Emeck do
         :meck.called(unquote(m), unquote(f), unquote(args))
       end
     end
+
+
+    defmacro num_calls({{:., _, [m, f]}, _, []}) do
+      quote do
+        :meck.num_calls(unquote(m), unquote(f), :_)
+      end
+    end
+
+    defmacro num_calls({{:., _, [m, f]}, _, args}) do
+      quote do
+        :meck.num_calls(unquote(m), unquote(f), unquote(args))
+      end
+    end
+
+
+    defmacro reset(mod) do
+      quote do
+        :meck.reset(unquote(mod))
+      end
+    end
   end
 end
