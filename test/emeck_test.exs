@@ -15,5 +15,7 @@ defmodule EmeckTest do
       assert called String.length("abc")
       assert not called String.length("abd")
     end
+
+    assert String.length("abc") == 3
   end
 end
