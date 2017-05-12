@@ -45,7 +45,16 @@ defmodule Emeck do
     end
 
 
-    defmacro called(m) do
+    defmacro called({{:., _, [m, f]}, _, []}) do
+      quote do
+        :meck.called(unquote(m), unquote(f), :_)
+      end
+    end
+
+    defmacro called({{:., _, [m, f]}, _, args}) do
+      quote do
+        :meck.called(unquote(m), unquote(f), unquote(args))
+      end
     end
   end
 end
