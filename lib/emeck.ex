@@ -69,12 +69,5 @@ defmodule Emeck do
         :meck.num_calls(unquote(m), unquote(f), unquote(args))
       end
     end
-
-
-    defmacro reset(mod) do
-      quote do
-        :meck.reset(unquote(mod))
-      end
-    end
   end
 end
