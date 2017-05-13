@@ -7,9 +7,12 @@ defmodule Emeck do
   defmacro with_meck(mods, do: test) do
     quote do
       import Emeck.Helper
+      mods =
+        case unquote(mods) do
+          list when is_list(list) -> list
+          atom when is_atom(atom) -> [atom]
+        end
 
-      mods = unquote(mods)
-      mods = is_list(mods) && mods || [mods]
       Enum.map(mods, fn
         {mod, opts} -> :meck.new(mod, opts)
         mod -> :meck.new(mod)
@@ -25,7 +28,7 @@ defmodule Emeck do
 
 
   defmodule Helper do
-    defmacro expect({{:., _, [m, f]}, _, []}, proxy) do
+    defmacro spy({{:., _, [m, f]}, _, []}, proxy) do
       quote do
         :meck.expect(unquote(m), unquote(f), unquote(proxy))
       end
@@ -58,13 +61,13 @@ defmodule Emeck do
     end
 
 
-    defmacro num_calls({{:., _, [m, f]}, _, []}) do
+    defmacro call_count({{:., _, [m, f]}, _, []}) do
       quote do
         :meck.num_calls(unquote(m), unquote(f), :_)
       end
     end
 
-    defmacro num_calls({{:., _, [m, f]}, _, args}) do
+    defmacro call_count({{:., _, [m, f]}, _, args}) do
       quote do
         :meck.num_calls(unquote(m), unquote(f), unquote(args))
       end

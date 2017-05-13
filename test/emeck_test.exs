@@ -3,9 +3,9 @@ defmodule EmeckTest do
   import Emeck
 
 
-  test "use mock" do
+  test "simple mock" do
     with_meck String do
-      expect String.length, fn s ->
+      spy String.length, fn s ->
         passthrough([s]) * 2
       end
 
@@ -15,14 +15,21 @@ defmodule EmeckTest do
       assert called String.length("abc")
       refute called String.length("abd")
 
-      assert num_calls(String.length) == 1
-      assert num_calls(String.length("abc")) == 1
+      assert call_count(String.length) == 1
+      assert call_count(String.length("abc")) == 1
 
       String.length("abd")
       assert called String.length("abd")
-      assert num_calls(String.length) == 2
+      assert call_count(String.length) == 2
     end
 
     assert String.length("abc") == 3
+  end
+
+
+  test "multiple mods" do
+    with_meck [String] do
+      assert 1 == 1
+    end
   end
 end
