@@ -5,6 +5,7 @@ defmodule Emeck.Mixfile do
     [app: :emeck,
      version: "0.1.0",
      elixir: "~> 1.4",
+     elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
@@ -17,6 +18,11 @@ defmodule Emeck.Mixfile do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger]]
   end
+
+
+  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
+  defp elixirc_paths(_),     do: ["lib", "web"]
+
 
   # Dependencies can be Hex packages:
   #

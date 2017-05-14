@@ -24,7 +24,6 @@ defmodule Emeck do
         Enum.map(mods, &:meck.unload/1)
       end
     end
-    :ok
   end
 
 
