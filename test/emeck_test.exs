@@ -131,6 +131,12 @@ defmodule EmeckTest do
         {["ab"], 2},
         {["abc"], 3}
       ]
+
+      assert call_args(String.length) == ["abc"]
+      assert call_return(String.length) == 3
+
+      assert first_call(String.length) == {["a"] ,1}
+      assert last_call(String.length) == {["abc"] ,3}
     end
   end
 end

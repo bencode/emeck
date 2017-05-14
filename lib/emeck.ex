@@ -77,16 +77,16 @@ defmodule Emeck do
     end
 
 
-    defmacro called(call) do
-      {m, f, a} = mfa(call)
+    defmacro called(expr) do
+      {m, f, a} = mfa(expr)
       quote do
         :meck.called(unquote(m), unquote(f), unquote(a))
       end
     end
 
 
-    defmacro call_count(call) do
-      {m, f, a} = mfa(call)
+    defmacro call_count(expr) do
+      {m, f, a} = mfa(expr)
       quote do
         :meck.num_calls(unquote(m), unquote(f), unquote(a))
       end
@@ -100,8 +100,8 @@ defmodule Emeck do
     end
 
 
-    defmacro calls(call) do
-      {m, f, a} = mfa(call)
+    defmacro calls(expr) do
+      {m, f, a} = mfa(expr)
       quote bind_quoted: [m: m, f: f, a: a] do
         list = :meck.history(m)
         list
@@ -118,18 +118,30 @@ defmodule Emeck do
       end
     end
 
-
-    defmacro call_args do
+    defmacro call_args(expr) do
+      quote do
+        {args, _} = last_call(unquote(expr))
+        args
+      end
     end
 
-    defmacro call_return do
+    defmacro call_return(expr) do
+      quote do
+        {_, result} = last_call(unquote(expr))
+        result
+      end
     end
 
-
-    defmacro first_call do
+    defmacro first_call(expr) do
+      quote do
+        unquote(expr) |> calls |> List.first
+      end
     end
 
-    defmacro last_call do
+    defmacro last_call(expr) do
+      quote do
+        unquote(expr) |> calls |> List.last
+      end
     end
 
 
