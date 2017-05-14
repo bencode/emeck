@@ -81,25 +81,29 @@ defmodule EmeckTest do
       expect Foo.bar, fn -> :ok end
       expect Foo.bar, &passthrough(&1)
       expect Foo.bar, &passthrough(&1, &2)
-      expect Foo.bar, &passthrough(&1, &2, &3)
 
       Foo.bar
       Foo.bar("a")
       Foo.bar("a", "b")
+      Foo.bar("a", "b")
       Foo.bar("c", "d")
 
       assert called Foo.bar
-      assert call_count(Foo.bar) == 4
+      assert call_count(Foo.bar) == 5
 
       assert called Foo.bar("a")
       assert call_count(Foo.bar("a")) == 1
+
+      assert call_count(Foo.bar("a", "b")) == 2
 
       assert called Foo.bar("a", "b")
       assert call_count(Foo.bar("c", "d")) == 1
 
       assert called &Foo.bar/2
       assert call_count(&Foo.bar/0) == 1
-      assert call_count(&Foo.bar/2) == 2
+      assert call_count(&Foo.bar/2) == 3
+
+      refute called &Foo.bar/3
     end
   end
 
@@ -160,9 +164,6 @@ defmodule EmeckTest do
 
 
   test "mock httppotion" do
-    %{body: body} = HTTPoison.get!("https://github.com")
-    assert body =~ "<html"
-
     with_meck HTTPoison do
       expect HTTPoison.get!, fn url ->
         %{body: "hi: " <> url}
