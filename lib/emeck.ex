@@ -10,18 +10,21 @@ defmodule Emeck do
       mods =
         case unquote(mods) do
           list when is_list(list) -> list
-          atom when is_atom(atom) -> [atom]
+          item -> [item]
         end
 
       Enum.map(mods, fn
         {mod, opts} -> :meck.new(mod, opts)
-        mod -> :meck.new(mod)
+        mod -> :meck.new(mod, [:passthrough])
       end)
 
       try do
         unquote(test)
       after
-        Enum.map(mods, &:meck.unload/1)
+        Enum.map(mods, fn
+          {mod, _} -> :meck.unload(mod)
+          mod -> :meck.unload(mod)
+        end)
       end
     end
   end
@@ -97,14 +100,31 @@ defmodule Emeck do
     end
 
 
+    defmacro calls(call) do
+      {m, f, a} = mfa(call)
+      quote bind_quoted: [m: m, f: f, a: a] do
+        list = :meck.history(m)
+        list
+        |> Enum.filter(fn {_pid, {_mod, fun, args}, _result} ->
+          cond do
+            a == :_ -> fun == f
+            is_list(a) -> fun == f && args == a
+            is_number(a) -> fun == f && length(args) == a
+          end
+        end)
+        |> Enum.map(fn {_pid, {_mod, _fun, args}, result} ->
+          {args, result}
+        end)
+      end
+    end
+
+
     defmacro call_args do
     end
 
     defmacro call_return do
     end
 
-    defmacro calls do
-    end
 
     defmacro first_call do
     end

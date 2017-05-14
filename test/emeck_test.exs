@@ -19,6 +19,9 @@ defmodule EmeckTest do
       assert call_count(String.length)  == 2
       assert call_count(String.length("foo")) == 1
       assert call_count(String.length("foo bar")) == 1
+
+      # call not stubed method
+      assert String.split("foo bar") == ["foo", "bar"]
     end
 
     assert String.length("foo") == 3
@@ -110,6 +113,24 @@ defmodule EmeckTest do
 
       reset_call String
       refute called String.length
+    end
+  end
+
+
+  test "calls history" do
+    with_meck String do
+      expect String.length, &passthrough(&1)
+
+      String.length "a"
+      String.length "ab"
+      String.length "abc"
+
+      list = calls String.length
+      assert list = [
+        {["a"], 1},
+        {["ab"], 2},
+        {["abc"], 3}
+      ]
     end
   end
 end
