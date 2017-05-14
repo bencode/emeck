@@ -90,6 +90,13 @@ defmodule Emeck do
     end
 
 
+    defmacro reset_call(mod) do
+      quote do
+        :meck.reset(unquote(mod))
+      end
+    end
+
+
     defmacro call_args do
     end
 

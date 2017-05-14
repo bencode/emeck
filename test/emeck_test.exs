@@ -94,8 +94,22 @@ defmodule EmeckTest do
       assert called Foo.bar("a", "b")
       assert call_count(Foo.bar("c", "d")) == 1
 
+      assert called &Foo.bar/2
       assert call_count(&Foo.bar/0) == 1
       assert call_count(&Foo.bar/2) == 2
+    end
+  end
+
+
+  test "reset call" do
+    with_meck String do
+      expect String.length, &passthrough(&1)
+
+      assert String.length("abc") == 3
+      assert called String.length
+
+      reset_call String
+      refute called String.length
     end
   end
 end
