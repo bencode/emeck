@@ -28,8 +28,8 @@ defmodule Emeck do
 
 
   defmodule Helper do
-    defmacro expect(call, proxy) do
-      {m, f, []} = mfa(call)
+    # expect(Foo.bar, fn arg, ... -> ... end)
+    defmacro expect({{:., _, [m, f]}, _, []}, proxy) do
       quote do
         :meck.expect(unquote(m), unquote(f), unquote(proxy))
       end
@@ -75,23 +75,17 @@ defmodule Emeck do
 
 
     defmacro called(call) do
-      {m, f, a} = call_mfa(call)
+      {m, f, a} = mfa(call)
       quote do
         :meck.called(unquote(m), unquote(f), unquote(a))
       end
     end
 
+
     defmacro call_count(call) do
-      {m, f, a} = call_mfa(call)
+      {m, f, a} = mfa(call)
       quote do
         :meck.num_calls(unquote(m), unquote(f), unquote(a))
-      end
-    end
-
-    defp call_mfa(call) do
-      case mfa(call) do
-        {m, f, []} -> {m, f, :_}
-        {m, f, a} -> {m, f, a}
       end
     end
 
@@ -112,8 +106,14 @@ defmodule Emeck do
     end
 
 
-    defp mfa({{:., _, [m, f]}, _, a}) do
-      {m, f, a}
+    defp mfa({{:., _, [mod, fun]}, _, []}) do
+      {mod, fun, :_}
+    end
+    defp mfa({{:., _, [mod, fun]}, _, args}) do
+      {mod, fun, args}
+    end
+    defp mfa({:&, _, [{:/, _, [{{:., _, [mod, fun]}, _, []}, arity]}]}) do
+      {mod, fun, arity}
     end
   end
 end
