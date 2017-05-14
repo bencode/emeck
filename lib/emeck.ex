@@ -3,15 +3,11 @@ defmodule Emeck do
   Mock modules for unit test
   """
 
-
   defmacro with_meck(mods, do: test) do
+    mods = is_list(mods) && mods || [mods]
     quote do
       import Emeck.Helper
-      mods =
-        case unquote(mods) do
-          list when is_list(list) -> list
-          item -> [item]
-        end
+      mods = unquote(mods)
 
       Enum.map(mods, fn
         {mod, opts} -> :meck.new(mod, opts)
@@ -37,7 +33,6 @@ defmodule Emeck do
         :meck.expect(unquote(m), unquote(f), unquote(proxy))
       end
     end
-
 
     defmacro passthrough do
       quote do
@@ -76,7 +71,9 @@ defmodule Emeck do
       end
     end
 
-
+    # called String.length
+    # called String.length("foo")
+    # called &String.length/1
     defmacro called(expr) do
       {m, f, a} = mfa(expr)
       quote do
@@ -104,17 +101,7 @@ defmodule Emeck do
       {m, f, a} = mfa(expr)
       quote bind_quoted: [m: m, f: f, a: a] do
         list = :meck.history(m)
-        list
-        |> Enum.filter(fn {_pid, {_mod, fun, args}, _result} ->
-          cond do
-            a == :_ -> fun == f
-            is_list(a) -> fun == f && args == a
-            is_number(a) -> fun == f && length(args) == a
-          end
-        end)
-        |> Enum.map(fn {_pid, {_mod, _fun, args}, result} ->
-          {args, result}
-        end)
+        Emeck.Util.filter_calls(list, f, a)
       end
     end
 
@@ -153,6 +140,23 @@ defmodule Emeck do
     end
     defp mfa({:&, _, [{:/, _, [{{:., _, [mod, fun]}, _, []}, arity]}]}) do
       {mod, fun, arity}
+    end
+  end
+
+
+  defmodule Util do
+    def filter_calls(calls, f, a) do
+      calls
+      |> Enum.filter(fn {_pis, {_mod, fun, args}, _result} ->
+        cond do
+          a == :_ -> fun == f
+          is_list(a) -> fun == f && args == a
+          is_number(a) -> fun == f && length(args)
+        end
+      end)
+      |> Enum.map(fn {_pid, {_mod, _fun, args}, result} ->
+        {args, result}
+      end)
     end
   end
 end

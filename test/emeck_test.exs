@@ -126,7 +126,7 @@ defmodule EmeckTest do
       String.length "abc"
 
       list = calls String.length
-      assert list = [
+      assert list == [
         {["a"], 1},
         {["ab"], 2},
         {["abc"], 3}
