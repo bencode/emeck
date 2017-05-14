@@ -28,8 +28,8 @@ defmodule Emeck do
 
 
   defmodule Helper do
-    # expect(Foo.bar, fn)
-    defmacro expect({{:., _, [m, f]}, _, []}, proxy) do
+    defmacro expect(call, proxy) do
+      {m, f, []} = mfa(call)
       quote do
         :meck.expect(unquote(m), unquote(f), unquote(proxy))
       end
@@ -38,7 +38,7 @@ defmodule Emeck do
 
     defmacro passthrough do
       quote do
-        :meck.passthrough
+        :meck.passthrough([])
       end
     end
 
@@ -73,30 +73,28 @@ defmodule Emeck do
       end
     end
 
-    defmacro called({{:., _, [m, f]}, _, []}) do
+
+    defmacro called(call) do
+      {m, f, a} = call_mfa(call)
       quote do
-        :meck.called(unquote(m), unquote(f), :_)
+        :meck.called(unquote(m), unquote(f), unquote(a))
       end
     end
 
-    defmacro called({{:., _, [m, f]}, _, args}) do
+    defmacro call_count(call) do
+      {m, f, a} = call_mfa(call)
       quote do
-        :meck.called(unquote(m), unquote(f), unquote(args))
+        :meck.num_calls(unquote(m), unquote(f), unquote(a))
       end
     end
 
-
-    defmacro call_count({{:., _, [m, f]}, _, []}) do
-      quote do
-        :meck.num_calls(unquote(m), unquote(f), :_)
+    defp call_mfa(call) do
+      case mfa(call) do
+        {m, f, []} -> {m, f, :_}
+        {m, f, a} -> {m, f, a}
       end
     end
 
-    defmacro call_count({{:., _, [m, f]}, _, args}) do
-      quote do
-        :meck.num_calls(unquote(m), unquote(f), unquote(args))
-      end
-    end
 
     defmacro call_args do
     end
@@ -111,6 +109,11 @@ defmodule Emeck do
     end
 
     defmacro last_call do
+    end
+
+
+    defp mfa({{:., _, [m, f]}, _, a}) do
+      {m, f, a}
     end
   end
 end

@@ -49,6 +49,7 @@ defmodule EmeckTest do
     assert Foo.bar("a") == "a"
 
     with_meck Foo do
+      expect Foo.bar, fn -> passthrough() end
       expect Foo.bar, &passthrough(&1)
       expect Foo.bar, &passthrough(&1, &2)
       expect Foo.bar, &passthrough(&1, &2, &3)
@@ -57,6 +58,7 @@ defmodule EmeckTest do
       # more arity should passed as list
       expect Foo.bar, &passthrough([&1, &2, &3, &4, &5, &6])
 
+      assert Foo.bar() == "hello"
       assert Foo.bar("a") == "a"
       assert Foo.bar("a", "b") == ["a", "b"]
       assert Foo.bar("a", "b", "c") == ["a", "b", "c"]
@@ -65,33 +67,31 @@ defmodule EmeckTest do
       assert Foo.bar("a", "b", "c", "d", "e","f") == ["a", "b", "c", "d", "e", "f"]
 
       assert called Foo.bar
-      assert call_count(Foo.bar) == 6
+      assert call_count(Foo.bar) == 7
+      assert call_count(Foo.bar("a", "b")) == 1
     end
   end
 
 
-  # test "call and call_count with different arity" do
-  #   with_meck Foo do
-  #     expect Foo.bar &passthrough(&1)
-  #     expect Foo.bar &passthrough(&1, &2)
-  #     expect Foo.bar &passthrough(&1, &2, &3)
+  test "call and call_count with different arity" do
+    with_meck Foo do
+      expect Foo.bar, &passthrough(&1)
+      expect Foo.bar, &passthrough(&1, &2)
+      expect Foo.bar, &passthrough(&1, &2, &3)
 
-  #     Foo.bar("a")
-  #     Foo.bar("a", "b")
-  #     Foo.bar("c", "d")
+      Foo.bar("a")
+      Foo.bar("a", "b")
+      Foo.bar("c", "d")
 
-  #     assert called Foo.bar
-  #     assert call_count Foo.bar == 3
+      assert called Foo.bar
+      assert call_count(Foo.bar) == 3
 
-  #     assert called Foo.bar("a")
-  #     assert call_count Foo.bar("a") == 1
+      assert called Foo.bar("a")
+      assert call_count(Foo.bar("a")) == 1
 
-  #     assert called Foo.bar("a", "b")
-  #     assert call_count Foo.bar("a", "b") == 1
-  #     assert call_count Foo.bar("c", "d") == 2
-
-  #     assert called &Foo.bar/1
-  #     IO.inspect called &Foo.bar/1
-  #   end
-  # end
+      assert called Foo.bar("a", "b")
+      assert call_count(Foo.bar("c", "d")) == 1
+      #assert call_count(&Foo.bar/2) == 2
+    end
+  end
 end
