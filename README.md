@@ -6,7 +6,7 @@
 [![Deps Status](https://beta.hexfaktor.org/badge/all/github/bencode/emeck.svg)](https://beta.hexfaktor.org/github/bencode/emeck)
 
 
-A Mocking library for Elixir language. It's implemented based on [meck](https://github.com/eproxus/meck)
+A Mocking library for Elixir language. It's implemented based on [meck](https://github.com/eproxus/meck).
 
 
 ## Installation
