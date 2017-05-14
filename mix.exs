@@ -2,13 +2,17 @@ defmodule Emeck.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :emeck,
-     version: "0.1.0",
-     elixir: "~> 1.4",
-     elixirc_paths: elixirc_paths(Mix.env),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :emeck,
+      version: "0.1.0",
+      elixir: "~> 1.4",
+      elixirc_paths: elixirc_paths(Mix.env),
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
+    ]
   end
 
   # Configuration for the OTP application
@@ -36,7 +40,8 @@ defmodule Emeck.Mixfile do
   defp deps do
     [
       {:meck, "~> 0.8"},
-      {:credo, "~> 0.7", only: [:dev, :test]}
+      {:credo, "~> 0.7", only: [:dev, :test]},
+      {:excoveralls, "~> 0.5", only: :test}
     ]
   end
 end

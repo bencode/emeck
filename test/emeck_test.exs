@@ -139,4 +139,22 @@ defmodule EmeckTest do
       assert last_call(String.length) == {["abc"] ,3}
     end
   end
+
+
+  test "calls history arity and arguments" do
+    with_meck Foo do
+      expect Foo.bar, &passthrough(&1)
+      expect Foo.bar, &passthrough(&1, &2)
+
+      Foo.bar("a")
+      Foo.bar("a", "b")
+
+      assert call_return(Foo.bar("a")) == "a"
+      assert call_return(Foo.bar("a", "b")) == ["a", "b"]
+
+      assert call_args(&Foo.bar/1) == ["a"]
+      assert call_args(&Foo.bar/2) == ["a", "b"]
+      assert call_args(Foo.bar) == ["a", "b"]  # last
+    end
+  end
 end

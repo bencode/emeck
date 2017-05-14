@@ -156,8 +156,8 @@ defmodule Emeck do
       |> Enum.filter(fn {_pis, {_mod, fun, args}, _result} ->
         cond do
           a == :_ -> fun == f
+          is_number(a) -> fun == f && length(args) == a
           is_list(a) -> fun == f && args == a
-          is_number(a) -> fun == f && length(args)
         end
       end)
       |> Enum.map(fn {_pid, {_mod, _fun, args}, result} ->
