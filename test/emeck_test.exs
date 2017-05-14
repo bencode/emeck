@@ -157,4 +157,25 @@ defmodule EmeckTest do
       assert call_args(Foo.bar) == ["a", "b"]  # last
     end
   end
+
+
+  test "mock httppotion" do
+    %{body: body} = HTTPoison.get!("https://github.com")
+    assert body =~ "<html"
+
+    with_meck HTTPoison do
+      expect HTTPoison.get!, fn url ->
+        %{body: "hi: " <> url}
+      end
+
+      %{body: body} = HTTPoison.get!("https://github.com")
+      assert body == "hi: https://github.com"
+
+      assert called HTTPoison.get!
+      assert call_count(HTTPoison.get!) == 1
+
+      assert call_args(HTTPoison.get!) == ["https://github.com"]
+      assert call_return(HTTPoison.get!) == %{body: "hi: https://github.com"}
+    end
+  end
 end

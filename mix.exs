@@ -41,6 +41,7 @@ defmodule Emeck.Mixfile do
     [
       {:meck, "~> 0.8"},
       {:credo, "~> 0.7", only: [:dev, :test]},
+      {:httpoison, "~> 0.11", only: :test},
       {:excoveralls, "~> 0.5", only: :test}
     ]
   end
