@@ -27,6 +27,10 @@ defmodule Emeck do
 
 
   defmodule Helper do
+    @moduledoc """
+    utility functions can be used in test.
+    """
+
     # expect(Foo.bar, fn arg, ... -> ... end)
     defmacro expect({{:., _, [m, f]}, _, []}, proxy) do
       quote do
@@ -145,6 +149,8 @@ defmodule Emeck do
 
 
   defmodule Util do
+    @moduledoc false
+
     def filter_calls(calls, f, a) do
       calls
       |> Enum.filter(fn {_pis, {_mod, fun, args}, _result} ->

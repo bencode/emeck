@@ -34,6 +34,9 @@ defmodule Emeck.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:meck, "~> 0.8"}]
+    [
+      {:meck, "~> 0.8"},
+      {:credo, "~> 0.7", only: [:dev, :test]}
+    ]
   end
 end
