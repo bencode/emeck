@@ -4,7 +4,7 @@ defmodule Emeck.Mixfile do
   def project do
     [
       app: :emeck,
-      version: "0.1.0",
+      version: "1.0.0",
       elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
