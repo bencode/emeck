@@ -3,7 +3,6 @@ defmodule Emeck.Helper do
   utility functions can be used in test.
   """
 
-  # expect(Foo.bar, fn arg, ... -> ... end)
   defmacro expect({{:., _, [m, f]}, _, []}, proxy) do
     quote do
       :meck.expect(unquote(m), unquote(f), unquote(proxy))
